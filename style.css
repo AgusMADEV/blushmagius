@@ -1,5 +1,4 @@
 /* style.css */
-@import url('https://static.jocarsa.com/fuentes/ubuntu-font-family-0.83/ubuntu.css');
 
 /* Reset some defaults */
 * {
@@ -17,19 +16,18 @@ body {
 
 /* Header styling */
 header {
-  background-color: #4e1c9c;
+  background-color: #1a113e;
   padding: 20px;
   text-align: center;
   font-size: 24px;
   font-weight: bold;
-  border-bottom: 1px solid rgb(106, 70, 192)  ;
-  color: #a52297;
+  border-bottom: 1px solid whitesmoke;
   display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    align-content: stretch;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	align-content: stretch;
 }
 header img{
 	width:60px;
@@ -44,9 +42,8 @@ header img{
 /* Navigation sidebar (left vertical actions) */
 nav {
   width: 220px;
-  background-color: rgb(106, 70, 192); /* a very light tint complementing lavenderblush */
+  background-color: #361780; /* a very light tint complementing lavenderblush */
   border-right: 1px solid #ddd;
-  color: whitesmoke;
   padding: 20px;
   overflow-y: auto;
 }
@@ -69,7 +66,7 @@ nav a {
 }
 
 nav a:hover {
-  background-color: #83689A;
+  background-color: #2d0c59;
 }
 
 /* Main workspace styling */
@@ -82,7 +79,7 @@ main {
 
 /* Optional: Styling for buttons inside the nav or main workspace */
 button {
-  background-color: #83689A;
+  background-color: lavenderblush;
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 10px 15px;
