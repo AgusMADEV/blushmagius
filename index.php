@@ -15,7 +15,7 @@ try {
 }
 
 if ($initDb) {
-    // Create schema
+    // Create schema on first run
     $db->exec("
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +42,7 @@ if ($initDb) {
         );
     ");
 
-    // Insert initial user (plain password for demo)
+    // Insert initial user (demo: plain password)
     $stmt = $db->prepare("INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)");
     $stmt->execute([
         'Agustín Morcillo Aguado',
@@ -52,6 +52,13 @@ if ($initDb) {
     ]);
 }
 
+// 1) Attempt to add columns pos_x and pos_y (ignore if they exist).
+try {
+    $db->exec("ALTER TABLE classes ADD COLUMN pos_x REAL DEFAULT 250");
+    $db->exec("ALTER TABLE classes ADD COLUMN pos_y REAL DEFAULT 250");
+} catch (Exception $e) {
+    // If columns already exist, ignore
+}
 
 /****************************************************
  * 1) HELPER FUNCTIONS
@@ -85,7 +92,6 @@ function redirect($url) {
     header("Location: $url");
     exit;
 }
-
 
 /****************************************************
  * 2) HANDLE ACTIONS (LOGIN, LOGOUT, CREATE PROJECT, SELECT PROJECT)
@@ -146,7 +152,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'select_project') {
     redirect('index.php');
 }
 
-
 /****************************************************
  * 3) HANDLE AJAX FOR SAVING / LOADING CLASSES
  ****************************************************/
@@ -181,18 +186,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax']) && $_GET['ajax
         exit;
     }
 
-    // Save to DB: remove old, insert new
+    // Save to DB: remove old classes, insert new
     $db->beginTransaction();
     try {
+        // delete any old classes for this project
         $del = $db->prepare("DELETE FROM classes WHERE project_id = ?");
         $del->execute([$projectId]);
 
-        $ins = $db->prepare("INSERT INTO classes (project_id, class_name, properties, methods) VALUES (?, ?, ?, ?)");
+        // re-insert
+        $ins = $db->prepare("
+            INSERT INTO classes (project_id, class_name, properties, methods, pos_x, pos_y) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
         foreach ($classesData as $cls) {
-            $cn = trim($cls['className']);
+            $cn = trim($cls['className'] ?? 'Clase');
             $props = isset($cls['properties']) ? json_encode($cls['properties']) : '[]';
             $mets = isset($cls['methods']) ? json_encode($cls['methods']) : '[]';
-            $ins->execute([$projectId, $cn, $props, $mets]);
+            $posX = floatval($cls['x'] ?? 250);
+            $posY = floatval($cls['y'] ?? 250);
+
+            $ins->execute([$projectId, $cn, $props, $mets, $posX, $posY]);
         }
 
         $db->commit();
@@ -223,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['ajax']) && $_GET['ajax'
         exit;
     }
 
-    $stmt = $db->prepare("SELECT class_name, properties, methods FROM classes WHERE project_id = ?");
+    $stmt = $db->prepare("SELECT class_name, properties, methods, pos_x, pos_y FROM classes WHERE project_id = ?");
     $stmt->execute([$projectId]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -232,13 +245,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['ajax']) && $_GET['ajax'
         $out[] = [
             'className' => $r['class_name'],
             'properties' => json_decode($r['properties'], true),
-            'methods' => json_decode($r['methods'], true),
+            'methods'    => json_decode($r['methods'], true),
+            'x'          => (float)$r['pos_x'],
+            'y'          => (float)$r['pos_y'],
         ];
     }
     echo json_encode($out);
     exit;
 }
-
 
 /****************************************************
  * 4) IF NOT LOGGED IN => SHOW LOGIN PAGE
@@ -253,24 +267,26 @@ if (!logged_in_user_id()):
     <style>
         body {
           margin:0; padding:0;
-          font-family: Arial, sans-serif;
-          background: linear-gradient(120deg, #ffeef3, #ffdff0);
+          font-family: Arial, Helvetica, sans-serif;
+          background:#221267;
           display:flex; 
           align-items:center; 
           justify-content:center; 
           height:100vh;
         }
         .login-box {
-          background:white;
+          background:rgb(120, 100, 235);
           padding:30px;
           border-radius:10px;
-          box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 20px rgba(31, 31, 31, 0.77);
           max-width:300px;
           width:100%;
         }
         h1 {
           text-align:center;
           margin-bottom:20px;
+          font-size: 23px;
+          color:rgb(241, 106, 219);
         }
         .flash-msg {
           color: red;
@@ -280,6 +296,7 @@ if (!logged_in_user_id()):
         label {
           display:block;
           margin:10px 0 5px;
+          color: whitesmoke;
         }
         input[type=text],
         input[type=password] {
@@ -290,29 +307,34 @@ if (!logged_in_user_id()):
           border-radius:5px;
         }
         button {
-          margin-top:15px;
+          margin-top:25px;
           width:100%;
           padding:10px;
-          background: #f8b2cd;
+          background: rgb(241, 106, 219);
+          color: whitesmoke;
           border:none;
           border-radius:5px;
           cursor:pointer;
           font-weight:bold;
         }
         button:hover {
-          background: #ffa6c9;
+          background: rgb(201, 74, 180);
+        }
+        .login-box img{
+        		width:100%;
         }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h1>Login</h1>
+        <h1>agusmadev | blushmagius</h1>
         <?php 
         $msg = get_message();
         if ($msg): ?>
           <div class="flash-msg"><?= htmlspecialchars($msg) ?></div>
         <?php endif; ?>
         <form method="post">
+         	<img src="mismagius1.png" alt="Logo" />
             <input type="hidden" name="action" value="login">
             <label>Username</label>
             <input type="text" name="username" required>
@@ -330,7 +352,6 @@ endif; // end if not logged in
 /****************************************************
  * 5) LOGGED IN => SHOW MAIN UI
  ****************************************************/
-
 // Fetch user projects
 $stmt = $db->prepare("SELECT id, project_name FROM projects WHERE user_id = ?");
 $stmt->execute([logged_in_user_id()]);
@@ -338,6 +359,7 @@ $userProjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // If session project not in DB or not set, we do not select one
 $currentProjectId = $_SESSION['project_id'] ?? 0;
+$currentProjectName = "";
 if ($currentProjectId) {
     // Validate it
     $stmt = $db->prepare("SELECT id, project_name FROM projects WHERE id = ? AND user_id = ?");
@@ -358,161 +380,160 @@ if ($currentProjectId) {
     <meta charset="utf-8">
     <title>agusmadev | blushmagius - Multiuser / Multiproject</title>
     <style>
+        * {
+        margin:0; 
+        padding:0; 
+        box-sizing:border-box;
+        }
+        body {
+        font-family: Ubuntu, sans-serif;
+        background: #fff;
+        color: #333;
+        height:100vh; 
+        display:flex; 
+        flex-direction:column;
+        }
+        header {
+        background-color: #1a113e;
+        color: #c71585;
+        padding: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        border-bottom: 2px solid whitesmoke;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+        header img {
+        width: 60px;
+        margin-right: 20px;
+        }
+        .flash-msg {
+        color: green;
+        font-weight: bold;
+        padding:10px;
+        text-align:center;
+        }
 
-* {
-  margin:0; 
-  padding:0; 
-  box-sizing:border-box;
-}
-body {
-  font-family: Ubuntu, sans-serif;
-  background: #fff;
-  color: #333;
-  height:100vh; 
-  display:flex; 
-  flex-direction:column;
-}
-header {
-  background-color: #1a113e;
-  color: #c71585;
-  padding: 20px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  border-bottom: 2px solid whitesmoke;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-header img {
-  width: 60px;
-  margin-right: 20px;
-}
-.flash-msg {
-  color: green;
-  font-weight: bold;
-  padding:10px;
-  text-align:center;
-}
+        /* Main container: nav + workspace */
+        .container {
+        flex:1; 
+        display:flex;
+        }
 
-/* Main container: nav + workspace */
-.container {
-  flex:1; 
-  display:flex;
-}
+        /* Left navigation panel */
+        nav {
+        width: 250px;
+        background: #361780;
+        border-right: 2px solid whitesmoke;
+        padding: 20px;
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        nav h3 {
+        margin-bottom:10px;
+        color: #c71585;
+        font-weight:bold;
+        }
+        nav form {
+        margin-bottom:20px;
+        background:rgb(115, 60, 216);
+        padding:10px;
+        border-radius:5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        nav form label {
+        display:block;
+        color: whitesmoke;
+        margin-bottom:5px;
+        font-weight:bold;
+        }
+        nav form input[type="text"],
+        nav form select {
+        width:100%;
+        padding:6px;
+        margin-bottom:10px;
+        border:1px solid #ccc;
+        border-radius:4px;
+        }
+        nav form button,
+        nav a.nav-button {
+        display:inline-block;
+        padding:8px 12px;
+        margin-right:5px;
+        border:none;
+        border-radius:4px;
+        background: #c71585;
+        color:whitesmoke;
+        cursor:pointer;
+        text-decoration:none;
+        text-align:center;
+        font-weight:bold;
+        }
+        nav a.nav-button-logout{
+        color:white;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        font-size: 13px;
+        position: relative;
+        top: 55px;
+        }
+        nav form button:hover,
+        nav a.nav-button:hover {
+        background: #ff9ebe;
+        }
 
-/* Left navigation panel */
-nav {
-  width: 250px;
-  background: #361780;
-  border-right: 2px solid whitesmoke;
-  padding: 20px;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-}
-nav h3 {
-  margin-bottom:10px;
-  color: #c71585;
-  font-weight:bold;
-}
-nav form {
-  margin-bottom:20px;
-  background:rgb(115, 60, 216);
-  padding:10px;
-  border-radius:5px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-nav form label {
-  display:block;
-  color: whitesmoke;
-  margin-bottom:5px;
-  font-weight:bold;
-}
-nav form input[type="text"],
-nav form select {
-  width:100%;
-  padding:6px;
-  margin-bottom:10px;
-  border:1px solid #ccc;
-  border-radius:4px;
-}
-nav form button,
-nav a.nav-button {
-  display:inline-block;
-  padding:8px 12px;
-  margin-right:5px;
-  border:none;
-  border-radius:4px;
-  background: #c71585;
-  color:whitesmoke;
-  cursor:pointer;
-  text-decoration:none;
-  text-align:center;
-  font-weight:bold;
-}
-nav a.nav-button-logout{
-  color:white;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  font-size: 13px;
-  position: relative;
-  top: 55px;
-}
-nav form button:hover,
-nav a.nav-button:hover {
-  background: #ff9ebe;
-}
+        /* Draggable workspace */
+        main {
+        flex:1; 
+        position:relative;
+        overflow:hidden; 
+        background: #fafafa;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+        }
 
-/* Draggable workspace */
-main {
-  flex:1; 
-  position:relative;
-  overflow:hidden; 
-  background: #fafafa;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-}
+        /* Draggable articles */
+        .draggable {
+        width: 220px;
+        height: 320px;
+        position: absolute;
+        background: #fff;
+        border: 2px solid lavenderblush;
+        border-radius: 8px;
+        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        }
+        .draggable .nombre {
+        background: #c71585;
+        color: white;
+        padding:5px;
+        font-weight:bold;
+        text-align:center;
+        }
+        .draggable .propiedades,
+        .draggable .metodos {
+        padding:8px;
+        }
+        .draggable p {
+        font-weight: bold;
+        margin-bottom:5px;
+        }
+        .draggable ul {
+        padding-left:20px;
+        list-style: disc;
+        }
+        .draggable ul li {
+        margin-bottom:5px;
+        }
 
-/* Draggable articles */
-.draggable {
-  width: 220px;
-  height: 320px;
-  position: absolute;
-  background: #fff;
-  border: 2px solid lavenderblush;
-  border-radius: 8px;
-  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-.draggable .nombre {
-  background: #c71585;
-  color: white;
-  padding:5px;
-  font-weight:bold;
-  text-align:center;
-}
-.draggable .propiedades,
-.draggable .metodos {
-  padding:8px;
-}
-.draggable p {
-  font-weight: bold;
-  margin-bottom:5px;
-}
-.draggable ul {
-  padding-left:20px;
-  list-style: disc;
-}
-.draggable ul li {
-  margin-bottom:5px;
-}
+        /* ContentEditable placeholders styling (optional) */
+        [contenteditable="true"]:empty:before {
+        content: attr(placeholder);
+        color: #aaa;
+        }
 
-/* ContentEditable placeholders styling (optional) */
-[contenteditable="true"]:empty:before {
-  content: attr(placeholder);
-  color: #aaa;
-}
-
-/* Scroll handling for main if needed */
+/* scroll handling for main if needed */
 main {
   overflow:auto;
 }
@@ -590,7 +611,7 @@ if ($msg): ?>
 <script>
 // 1) Draggable setup
 function makeDraggable(el) {
-  let offsetX, offsetY;
+  let offsetX = 0, offsetY = 0;
   let isDragging = false;
 
   el.addEventListener("mousedown", e => {
@@ -629,10 +650,16 @@ function getClasses() {
       mets.push(li.textContent.trim());
     });
 
+    // parseInt for left & top to store them as numbers
+    const xPos = parseInt(a.style.left, 10) || 250;
+    const yPos = parseInt(a.style.top, 10)  || 250;
+
     result.push({
       className: className,
       properties: props,
-      methods: mets
+      methods: mets,
+      x: xPos,
+      y: yPos
     });
   });
   return result;
@@ -673,21 +700,31 @@ function loadClasses() {
           const clone = tpl.content.cloneNode(true);
           const article = clone.querySelector("article");
 
+          // Class name
           article.querySelector(".nombre").textContent = cls.className;
+
+          // properties
           const ulProps = article.querySelector(".propiedades ul");
           ulProps.innerHTML = "";
-          cls.properties.forEach(p => {
+          (cls.properties || []).forEach(p => {
             const li = document.createElement("li");
             li.textContent = p;
             ulProps.appendChild(li);
           });
+
+          // methods
           const ulMets = article.querySelector(".metodos ul");
           ulMets.innerHTML = "";
-          cls.methods.forEach(m => {
+          (cls.methods || []).forEach(m => {
             const li = document.createElement("li");
             li.textContent = m;
             ulMets.appendChild(li);
           });
+
+          // Position
+          article.style.left = (cls.x || 250) + "px";
+          article.style.top  = (cls.y || 250) + "px";
+
           document.querySelector("main").appendChild(article);
           makeDraggable(article);
         });
@@ -723,7 +760,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveClasses();
   });
 
-  // On page load, try to load classes for the selected project (if any)
+  // On page load, load classes for the selected project (if any)
   loadClasses();
 });
 </script>
