@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>agusmadev | blushmagius</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+    	<img src="mismagius1.png">
+      <h1>agusmadev | blushmagius</h1>
+    </header>
+    
+    <!-- Main layout container -->
+    <div class="container">
+      <!-- Navigation sidebar (vertical actions) -->
+      <nav>
+        <ul>
+          <li><a href="#" id="addBtn">Añadir clase</a></li>
+          <li><a href="#" id="listBtn">Mostrar clases</a></li>
+          <li><a href="#" id="saveBtn">Guardar clases</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Main workspace area -->
+      <main>
+        <!-- Template for the draggable article -->
+        <template id="article-template">
+          <article class="draggable">
+            <div class="nombre" contenteditable="true">Clase</div>
+            <div class="propiedades">
+              <p>Propiedades</p>
+              <ul contenteditable="true">
+                <li>Introduce tus propiedades...</li>
+              </ul>
+            </div>
+            <div class="metodos">
+              <p>Métodos</p>
+              <ul contenteditable="true">
+                <li>Introduce tus métodos...</li>
+              </ul>
+            </div>
+          </article>
+        </template>
+      </main>
+    </div>
+    <script src="script.js"> </script>
+  </body>
+</html>

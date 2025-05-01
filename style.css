@@ -1,0 +1,122 @@
+/* style.css */
+@import url('https://static.jocarsa.com/fuentes/ubuntu-font-family-0.83/ubuntu.css');
+
+/* Reset some defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global body styling */
+body {
+  font-family: Ubuntu, sans-serif;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Header styling */
+header {
+  background-color: #4e1c9c;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 1px solid rgb(106, 70, 192)  ;
+  color: #a52297;
+  display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: stretch;
+}
+header img{
+	width:60px;
+	margin-right:20px;
+}
+/* Main layout container */
+.container {
+  display: flex;
+  height: calc(100vh - 70px); /* adjust according to header height */
+}
+
+/* Navigation sidebar (left vertical actions) */
+nav {
+  width: 220px;
+  background-color: rgb(106, 70, 192); /* a very light tint complementing lavenderblush */
+  border-right: 1px solid #ddd;
+  color: whitesmoke;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+nav ul {
+  list-style: none;
+}
+
+nav li {
+  margin-bottom: 15px;
+}
+
+nav a {
+  text-decoration: none;
+  color: whitesmoke;
+  display: block;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+nav a:hover {
+  background-color: #83689A;
+}
+
+/* Main workspace styling */
+main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow:5px 5px 25px rgba(0,0,0,0.1) inset;
+}
+
+/* Optional: Styling for buttons inside the nav or main workspace */
+button {
+  background-color: #83689A;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #f3e5e5;
+}
+
+/* Example styling for draggable articles if needed */
+.draggable {
+        width: 200px;
+        height: 300px;
+        border: 1px solid white;
+        border-radius: 5px;
+        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        position: absolute;
+        background: white;
+      }
+      .draggable ul {
+        padding-left: 20px;
+      }
+      .draggable div {
+        padding: 5px;
+      }
+      .draggable .nombre {
+        background: green;
+        color: white;
+      }
+      .draggable p {
+        font-weight: bold;
+      }
