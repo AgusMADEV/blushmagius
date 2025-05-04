@@ -1,119 +1,173 @@
-/* style.css */
+/* style.css renovado */
 
-/* Reset some defaults */
+/* Reset y box‐sizing */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Global body styling */
-body {
-  font-family: Ubuntu, sans-serif;
-  background-color: #fff;
-  color: #333;
+/* Variables de color */
+:root {
+  --color-bg: #f9f8fa;
+  --color-primary: #655174;   /* púrpura oscuro */
+  --color-secondary: #421929; /* borgoña profundo */
+  --color-accent: #D14768;    /* rojo anaranjado */
+  --color-light: #E5889A;     /* rosa suave */
+  --color-highlight: #FFAEB5; /* rosa pálido */
+  --font-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Header styling */
+/* Cuerpo */
+body {
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--color-secondary);
+  line-height: 1.6;
+}
+
+/* Encabezado */
 header {
-  background-color: #1a113e;
-  padding: 20px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  border-bottom: 1px solid whitesmoke;
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  padding: 1rem 2rem;
   display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	justify-content: center;
-	align-items: center;
-	align-content: stretch;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-header img{
-	width:60px;
-	margin-right:20px;
+header img {
+  width: 50px;
+  margin-right: 1rem;
 }
-/* Main layout container */
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+/* Contenedor principal */
 .container {
   display: flex;
-  height: calc(100vh - 70px); /* adjust according to header height */
+  height: calc(100vh - 75px);
 }
 
-/* Navigation sidebar (left vertical actions) */
+/* Navegación lateral */
 nav {
-  width: 220px;
-  background-color: #361780; /* a very light tint complementing lavenderblush */
-  border-right: 1px solid #ddd;
-  padding: 20px;
+  width: 240px;
+  background-color: var(--color-secondary);
+  padding: 1.5rem;
+  color: var(--color-bg);
   overflow-y: auto;
 }
-
-nav ul {
-  list-style: none;
+nav h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-accent);
+  padding-bottom: 0.5rem;
 }
-
-nav li {
-  margin-bottom: 15px;
+nav form {
+  margin-bottom: 1.5rem;
 }
-
-nav a {
-  text-decoration: none;
-  color: whitesmoke;
+nav label {
   display: block;
-  padding: 10px 15px;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+nav input[type="text"],
+nav select {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
   border-radius: 4px;
-  transition: background-color 0.3s;
+  margin-bottom: 0.75rem;
+}
+nav button,
+nav a.nav-button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.6rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+nav button:hover,
+nav a.nav-button:hover {
+  background-color: var(--color-highlight);
+}
+nav a.nav-button-logout {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: 1px solid var(--color-light);
+  color: var(--color-light);
+}
+nav a.nav-button-logout:hover {
+  background-color: var(--color-light);
+  color: var(--color-secondary);
 }
 
-nav a:hover {
-  background-color: #2d0c59;
-}
-
-/* Main workspace styling */
+/* Área de trabajo */
 main {
   flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  box-shadow:5px 5px 25px rgba(0,0,0,0.1) inset;
+  position: relative;
+  background: #fff;
+  padding: 1rem;
+  overflow: auto;
 }
 
-/* Optional: Styling for buttons inside the nav or main workspace */
-button {
-  background-color: lavenderblush;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 10px;
-}
-
-button:hover {
-  background-color: #f3e5e5;
-}
-
-/* Example styling for draggable articles if needed */
+/* Tarjetas “draggable” */
 .draggable {
-        width: 200px;
-        height: 300px;
-        border: 1px solid white;
-        border-radius: 5px;
-        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        position: absolute;
-        background: white;
-      }
-      .draggable ul {
-        padding-left: 20px;
-      }
-      .draggable div {
-        padding: 5px;
-      }
-      .draggable .nombre {
-        background: green;
-        color: white;
-      }
-      .draggable p {
-        font-weight: bold;
-      }
+  width: 220px;
+  min-height: 280px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  position: absolute;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: grab;
+}
+.draggable:active {
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+}
+.draggable .nombre {
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  padding: 0.6rem;
+  font-weight: 600;
+  text-align: center;
+}
+.draggable .propiedades,
+.draggable .metodos {
+  padding: 0.8rem;
+}
+.draggable p {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--color-secondary);
+}
+.draggable ul {
+  padding-left: 1rem;
+  list-style: disc;
+}
+.draggable ul li {
+  margin-bottom: 0.3rem;
+  color: var(--color-secondary);
+}
+
+/* Placeholders de contenteditable */
+[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  color: #bbb;
+  font-style: italic;
+}

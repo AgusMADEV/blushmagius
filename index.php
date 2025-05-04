@@ -40,6 +40,7 @@ if ($initDb) {
             methods TEXT,
             FOREIGN KEY(project_id) REFERENCES projects(id)
         );
+        
     ");
 
     // Insert initial user (demo: plain password)
@@ -265,65 +266,88 @@ if (!logged_in_user_id()):
     <meta charset="utf-8">
     <title>agusmadev | blushmagius - Login</title>
     <style>
-        body {
-          margin:0; padding:0;
-          font-family: Arial, Helvetica, sans-serif;
-          background:#221267;
-          display:flex; 
-          align-items:center; 
-          justify-content:center; 
-          height:100vh;
-        }
-        .login-box {
-          background:rgb(120, 100, 235);
-          padding:30px;
-          border-radius:10px;
-          box-shadow: 0 2px 20px rgba(31, 31, 31, 0.77);
-          max-width:300px;
-          width:100%;
-        }
-        h1 {
-          text-align:center;
-          margin-bottom:20px;
-          font-size: 23px;
-          color:rgb(241, 106, 219);
-        }
-        .flash-msg {
-          color: red;
-          text-align: center;
-          margin-bottom:10px;
-        }
-        label {
-          display:block;
-          margin:10px 0 5px;
-          color: whitesmoke;
-        }
-        input[type=text],
-        input[type=password] {
-          width: 100%;
-          padding:10px;
-          box-sizing: border-box;
-          border:1px solid #ddd;
-          border-radius:5px;
-        }
-        button {
-          margin-top:25px;
-          width:100%;
-          padding:10px;
-          background: rgb(241, 106, 219);
-          color: whitesmoke;
-          border:none;
-          border-radius:5px;
-          cursor:pointer;
-          font-weight:bold;
-        }
-        button:hover {
-          background: rgb(201, 74, 180);
-        }
-        .login-box img{
-        		width:100%;
-        }
-    </style>
+      /* Reset */
+      * { margin:0; padding:0; box-sizing:border-box; }
+
+      /* Variables */
+      :root {
+        --corp: #655174;
+        --bg-dark: #3b2f47;
+        --bg-light: #f4f1f7;
+        --accent: #d18bcc;
+        --text-light: #ffffff;
+        --font: "Segoe UI", sans-serif;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      .login-box {
+        background: var(--bg-light);
+        padding: 2.5rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        width: 320px;
+        text-align: center;
+      }
+
+      .login-box img {
+        width: 80px;
+        margin-bottom: 1rem;
+      }
+
+      .login-box h1 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: var(--corp);
+      }
+
+      .flash-msg {
+        color: #d9534f;
+        margin-bottom: 0.75rem;
+      }
+
+      .login-box label {
+        display: block;
+        text-align: left;
+        margin: 0.5rem 0 0.25rem;
+        font-weight: 500;
+        color: var(--corp);
+      }
+
+      .login-box input {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid var(--corp);
+        border-radius: 6px;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+      }
+
+      .login-box button {
+        width: 100%;
+        padding: 0.7rem;
+        background: var(--corp);
+        border: none;
+        color: var(--text-light);
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .login-box button:hover {
+        background: var(--accent);
+      }
+      </style>
+
 </head>
 <body>
     <div class="login-box">
@@ -380,164 +404,196 @@ if ($currentProjectId) {
     <meta charset="utf-8">
     <title>agusmadev | blushmagius - Multiuser / Multiproject</title>
     <style>
-        * {
-        margin:0; 
-        padding:0; 
-        box-sizing:border-box;
-        }
-        body {
-        font-family: Ubuntu, sans-serif;
-        background: #fff;
-        color: #333;
-        height:100vh; 
-        display:flex; 
-        flex-direction:column;
-        }
-        header {
-        background-color: #1a113e;
-        color: #c71585;
-        padding: 20px;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        border-bottom: 2px solid whitesmoke;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        }
-        header img {
-        width: 60px;
-        margin-right: 20px;
-        }
-        .flash-msg {
-        color: green;
-        font-weight: bold;
-        padding:10px;
-        text-align:center;
-        }
+  /* Reset */
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-        /* Main container: nav + workspace */
-        .container {
-        flex:1; 
-        display:flex;
-        }
+  /* Variables */
+  :root {
+    --corp: #655174;
+    --bg: #faf8fc;
+    --nav-bg: #4f3b5c;
+    --accent: #d18bcc;
+    --text: #333;
+    --light: #ffffff;
+    --font: "Segoe UI", sans-serif;
+  }
 
-        /* Left navigation panel */
-        nav {
-        width: 250px;
-        background: #361780;
-        border-right: 2px solid whitesmoke;
-        padding: 20px;
-        box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-        }
-        nav h3 {
-        margin-bottom:10px;
-        color: #c71585;
-        font-weight:bold;
-        }
-        nav form {
-        margin-bottom:20px;
-        background:rgb(115, 60, 216);
-        padding:10px;
-        border-radius:5px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        }
-        nav form label {
-        display:block;
-        color: whitesmoke;
-        margin-bottom:5px;
-        font-weight:bold;
-        }
-        nav form input[type="text"],
-        nav form select {
-        width:100%;
-        padding:6px;
-        margin-bottom:10px;
-        border:1px solid #ccc;
-        border-radius:4px;
-        }
-        nav form button,
-        nav a.nav-button {
-        display:inline-block;
-        padding:8px 12px;
-        margin-right:5px;
-        border:none;
-        border-radius:4px;
-        background: #c71585;
-        color:whitesmoke;
-        cursor:pointer;
-        text-decoration:none;
-        text-align:center;
-        font-weight:bold;
-        }
-        nav a.nav-button-logout{
-        color:white;
-        text-decoration: none;
-        text-align: center;
-        cursor: pointer;
-        font-size: 13px;
-        position: relative;
-        top: 55px;
-        }
-        nav form button:hover,
-        nav a.nav-button:hover {
-        background: #ff9ebe;
-        }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
 
-        /* Draggable workspace */
-        main {
-        flex:1; 
-        position:relative;
-        overflow:hidden; 
-        background: #fafafa;
-        box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-        }
+  header {
+    background: var(--corp);
+    color: var(--light);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  header img {
+    width: 50px;
+    margin-right: 1rem;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
 
-        /* Draggable articles */
-        .draggable {
-        width: 220px;
-        height: 320px;
-        position: absolute;
-        background: #fff;
-        border: 2px solid lavenderblush;
-        border-radius: 8px;
-        box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        }
-        .draggable .nombre {
-        background: #c71585;
-        color: white;
-        padding:5px;
-        font-weight:bold;
-        text-align:center;
-        }
-        .draggable .propiedades,
-        .draggable .metodos {
-        padding:8px;
-        }
-        .draggable p {
-        font-weight: bold;
-        margin-bottom:5px;
-        }
-        .draggable ul {
-        padding-left:20px;
-        list-style: disc;
-        }
-        .draggable ul li {
-        margin-bottom:5px;
-        }
+  .flash-msg {
+    background: var(--accent);
+    color: var(--light);
+    text-align: center;
+    padding: 0.75rem;
+    font-weight: 500;
+  }
 
-        /* ContentEditable placeholders styling (optional) */
-        [contenteditable="true"]:empty:before {
-        content: attr(placeholder);
-        color: #aaa;
-        }
+  .container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
 
-/* scroll handling for main if needed */
-main {
-  overflow:auto;
+  nav {
+    width: 260px;
+    background: var(--nav-bg);
+    color: var(--light);
+    padding: 1.5rem;
+    position: relative;
+    overflow-y: auto;
+  }
+  nav h3 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+  }
+  nav form {
+    margin-bottom: 1.25rem;
+  }
+  nav label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+  }
+  nav input, nav select {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+  }
+  nav button, nav a.nav-button {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    margin-bottom: 0.75rem;
+    background: var(--corp);
+    color: var(--light);
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 0.95rem;
+  }
+  nav button:hover, nav a.nav-button:hover {
+    background: var(--accent);
+  }
+  nav a.nav-button-logout {
+  display: block;
+  width: 100%;
+  padding: 0.65rem;
+  margin-top: 1rem;
+  background: var(--accent);
+  color: var(--light);
+  text-decoration: none;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
-    </style>
+
+nav a.nav-button-logout:hover {
+  background: var(--corp);
+}
+
+  /* Botones de proyecto (rename/delete/…) */
+  .proj-action {
+    background: transparent;
+    border: none;
+    color: var(--light);
+    margin-left: 0.3rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.1s ease;
+  }
+  .proj-action:hover { transform: scale(1.2); }
+
+  main {
+    flex: 1;
+    position: relative;
+    background: var(--light);
+    padding: 1rem;
+    overflow: auto;
+  }
+
+  .draggable {
+    width: 220px;
+    min-height: 280px;
+    background: var(--light);
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    position: absolute;
+    overflow: hidden;
+    cursor: grab;
+    transition: transform 0.2s ease;
+  }
+  .draggable:active {
+    transform: scale(1.02);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    cursor: grabbing;
+  }
+  .draggable .nombre {
+    background: var(--corp);
+    color: var(--light);
+    padding: 0.6rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  .draggable .propiedades,
+  .draggable .metodos {
+    padding: 0.8rem;
+  }
+  .draggable p {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--corp);
+  }
+  .draggable ul {
+    padding-left: 1rem;
+    list-style: disc;
+  }
+  .draggable ul li {
+    margin-bottom: 0.3rem;
+  }
+  [contenteditable="true"]:empty:before {
+    content: attr(placeholder);
+    color: #bbb;
+    font-style: italic;
+  }
+</style>
+
 </head>
 <body>
 
@@ -609,160 +665,160 @@ if ($msg): ?>
 </div>
 
 <script>
-// 1) Draggable setup
-function makeDraggable(el) {
-  let offsetX = 0, offsetY = 0;
-  let isDragging = false;
+  // 1) Draggable setup
+  function makeDraggable(el) {
+    let offsetX = 0, offsetY = 0;
+    let isDragging = false;
 
-  el.addEventListener("mousedown", e => {
-    isDragging = true;
-    offsetX = e.clientX - el.getBoundingClientRect().left;
-    offsetY = e.clientY - el.getBoundingClientRect().top;
-    el.style.cursor = "grabbing";
-    el.style.zIndex = 999999;
-  });
-
-  document.addEventListener("mousemove", e => {
-    if (!isDragging) return;
-    el.style.left = (e.clientX - offsetX) + "px";
-    el.style.top = (e.clientY - offsetY) + "px";
-  });
-
-  document.addEventListener("mouseup", () => {
-    isDragging = false;
-    el.style.cursor = "grab";
-    el.style.zIndex = 1;
-  });
-}
-
-// 2) Gather classes from DOM
-function getClasses() {
-  const articles = document.querySelectorAll("article.draggable");
-  let result = [];
-  articles.forEach(a => {
-    const className = a.querySelector(".nombre")?.textContent.trim() || "Clase";
-    const props = [];
-    a.querySelectorAll(".propiedades ul li").forEach(li => {
-      props.push(li.textContent.trim());
-    });
-    const mets = [];
-    a.querySelectorAll(".metodos ul li").forEach(li => {
-      mets.push(li.textContent.trim());
+    el.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - el.getBoundingClientRect().left;
+      offsetY = e.clientY - el.getBoundingClientRect().top;
+      el.style.cursor = "grabbing";
+      el.style.zIndex = 999999;
     });
 
-    // parseInt for left & top to store them as numbers
-    const xPos = parseInt(a.style.left, 10) || 250;
-    const yPos = parseInt(a.style.top, 10)  || 250;
-
-    result.push({
-      className: className,
-      properties: props,
-      methods: mets,
-      x: xPos,
-      y: yPos
+    document.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      el.style.left = (e.clientX - offsetX) + "px";
+      el.style.top = (e.clientY - offsetY) + "px";
     });
-  });
-  return result;
-}
 
-// 3) List classes in console
-function listClasses() {
-  console.log(getClasses());
-}
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      el.style.cursor = "grab";
+      el.style.zIndex = 1;
+    });
+  }
 
-// 4) Save classes (AJAX -> index.php?ajax=save_classes)
-function saveClasses() {
-  const data = getClasses();
-  fetch('index.php?ajax=save_classes', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data)
-  })
-  .then(r => r.text())
-  .then(msg => {
-    alert(msg);
-    console.log(msg);
-  })
-  .catch(err => console.error("Error saving classes:", err));
-}
+  // 2) Gather classes from DOM
+  function getClasses() {
+    const articles = document.querySelectorAll("article.draggable");
+    let result = [];
+    articles.forEach(a => {
+      const className = a.querySelector(".nombre")?.textContent.trim() || "Clase";
+      const props = [];
+      a.querySelectorAll(".propiedades ul li").forEach(li => {
+        props.push(li.textContent.trim());
+      });
+      const mets = [];
+      a.querySelectorAll(".metodos ul li").forEach(li => {
+        mets.push(li.textContent.trim());
+      });
 
-// 5) Load classes for the selected project
-function loadClasses() {
-  fetch('index.php?ajax=load_classes')
-    .then(r => r.json())
-    .then(data => {
-      if (Array.isArray(data)) {
-        // Clear existing
-        document.querySelectorAll("article.draggable").forEach(a => a.remove());
-        // Add each
-        data.forEach(cls => {
-          const tpl = document.getElementById("article-template");
-          const clone = tpl.content.cloneNode(true);
-          const article = clone.querySelector("article");
+      // parseInt for left & top to store them as numbers
+      const xPos = parseInt(a.style.left, 10) || 250;
+      const yPos = parseInt(a.style.top, 10)  || 250;
 
-          // Class name
-          article.querySelector(".nombre").textContent = cls.className;
+      result.push({
+        className: className,
+        properties: props,
+        methods: mets,
+        x: xPos,
+        y: yPos
+      });
+    });
+    return result;
+  }
 
-          // properties
-          const ulProps = article.querySelector(".propiedades ul");
-          ulProps.innerHTML = "";
-          (cls.properties || []).forEach(p => {
-            const li = document.createElement("li");
-            li.textContent = p;
-            ulProps.appendChild(li);
-          });
+  // 3) List classes in console
+  function listClasses() {
+    console.log(getClasses());
+  }
 
-          // methods
-          const ulMets = article.querySelector(".metodos ul");
-          ulMets.innerHTML = "";
-          (cls.methods || []).forEach(m => {
-            const li = document.createElement("li");
-            li.textContent = m;
-            ulMets.appendChild(li);
-          });
-
-          // Position
-          article.style.left = (cls.x || 250) + "px";
-          article.style.top  = (cls.y || 250) + "px";
-
-          document.querySelector("main").appendChild(article);
-          makeDraggable(article);
-        });
-      } else if (data.error) {
-        console.warn(data.error);
-      }
+  // 4) Save classes (AJAX -> index.php?ajax=save_classes)
+  function saveClasses() {
+    const data = getClasses();
+    fetch('index.php?ajax=save_classes', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
     })
-    .catch(err => console.error("Error loading classes:", err));
-}
+    .then(r => r.text())
+    .then(msg => {
+      alert(msg);
+      console.log(msg);
+    })
+    .catch(err => console.error("Error saving classes:", err));
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const addBtn = document.getElementById("addBtn");
-  const listBtn = document.getElementById("listBtn");
-  const saveBtn = document.getElementById("saveBtn");
-  const main = document.querySelector("main");
+  // 5) Load classes for the selected project
+  function loadClasses() {
+    fetch('index.php?ajax=load_classes')
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          // Clear existing
+          document.querySelectorAll("article.draggable").forEach(a => a.remove());
+          // Add each
+          data.forEach(cls => {
+            const tpl = document.getElementById("article-template");
+            const clone = tpl.content.cloneNode(true);
+            const article = clone.querySelector("article");
 
-  addBtn.addEventListener("click", e => {
-    e.preventDefault();
-    const tpl = document.getElementById("article-template");
-    const clone = tpl.content.cloneNode(true);
-    const article = clone.querySelector("article");
-    main.appendChild(article);
-    makeDraggable(article);
+            // Class name
+            article.querySelector(".nombre").textContent = cls.className;
+
+            // properties
+            const ulProps = article.querySelector(".propiedades ul");
+            ulProps.innerHTML = "";
+            (cls.properties || []).forEach(p => {
+              const li = document.createElement("li");
+              li.textContent = p;
+              ulProps.appendChild(li);
+            });
+
+            // methods
+            const ulMets = article.querySelector(".metodos ul");
+            ulMets.innerHTML = "";
+            (cls.methods || []).forEach(m => {
+              const li = document.createElement("li");
+              li.textContent = m;
+              ulMets.appendChild(li);
+            });
+
+            // Position
+            article.style.left = (cls.x || 250) + "px";
+            article.style.top  = (cls.y || 250) + "px";
+
+            document.querySelector("main").appendChild(article);
+            makeDraggable(article);
+          });
+        } else if (data.error) {
+          console.warn(data.error);
+        }
+      })
+      .catch(err => console.error("Error loading classes:", err));
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const addBtn = document.getElementById("addBtn");
+    const listBtn = document.getElementById("listBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const main = document.querySelector("main");
+
+    addBtn.addEventListener("click", e => {
+      e.preventDefault();
+      const tpl = document.getElementById("article-template");
+      const clone = tpl.content.cloneNode(true);
+      const article = clone.querySelector("article");
+      main.appendChild(article);
+      makeDraggable(article);
+    });
+
+    listBtn.addEventListener("click", e => {
+      e.preventDefault();
+      listClasses();
+    });
+
+    saveBtn.addEventListener("click", e => {
+      e.preventDefault();
+      saveClasses();
+    });
+
+    // On page load, load classes for the selected project (if any)
+    loadClasses();
   });
-
-  listBtn.addEventListener("click", e => {
-    e.preventDefault();
-    listClasses();
-  });
-
-  saveBtn.addEventListener("click", e => {
-    e.preventDefault();
-    saveClasses();
-  });
-
-  // On page load, load classes for the selected project (if any)
-  loadClasses();
-});
 </script>
 </body>
 </html>
